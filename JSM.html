@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Classifier</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+        }
+        #upload-form {
+            margin: 20px auto;
+            max-width: 400px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        #result {
+            margin: 20px auto;
+            max-width: 400px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Classifier</h1>
+    <form id="upload-form" action="http://localhost:8000/predict" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*" required>
+        <button type="submit">Upload & Predict</button>
+    </form>
+    <div id="result">
+        <h2>Prediction Result:</h2>
+        <p id="prediction"></p>
+    </div>
+    <script>
+        const form = document.getElementById("upload-form");
+        const resultDiv = document.getElementById("result");
+        const predictionPara = document.getElementById("prediction");
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+            try {
+                const response = await fetch("http://localhost:8000/predict", {
+                    method: "POST",
+                    body: formData,
+                });
+                console.log(response)
+
+                if (response.ok) {
+                    const result = await response.text();
+                    resultDiv.style.border = "1px solid #0a0";
+                    predictionPara.textContent = result;
+                } else {
+                    resultDiv.style.border = "1px solid #f00";
+                    predictionPara.textContent = "Prediction failed. Please try again.";
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                resultDiv.style.border = "1px solid #f00";
+                predictionPara.textContent = "An error occurred. Please try again.";
+            }
+        });
+    </script>
+</body>
+</html>
